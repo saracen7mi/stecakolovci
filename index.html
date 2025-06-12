@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -150,3 +150,144 @@
     </script>
 </body>
 </html>
+ -->
+
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR Turistički Vodič</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <style>
+      .language-buttons {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .language-buttons button {
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .language-buttons button:hover {
+        background-color: #0056b3;
+      }
+
+      #location-link {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        z-index: 999;
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #location-link:hover {
+        background-color: #1e7e34;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="language-buttons">
+      <button id="eng-button">English</button>
+      <button id="deu-button">Deutsch</button>
+      <button id="ita-button">Italiano</button>
+      <button id="tur-button">Türkçe</button>
+    </div>
+    <button id="location-link">Navigacija do tačke</button>
+
+    <a-scene>
+      <a-assets>
+        <audio id="audio-bosnian" src="audio/bosnian.mp3" preload="auto"></audio>
+        <audio id="audio-english" src="audio/english.mp3" preload="auto"></audio>
+        <audio id="audio-german" src="audio/german.mp3" preload="auto"></audio>
+        <audio id="audio-italian" src="audio/italian.mp3" preload="auto"></audio>
+        <audio id="audio-turkish" src="audio/turkish.mp3" preload="auto"></audio>
+
+        <a-asset-item id="model" src="model/model.gltf"></a-asset-item>
+      </a-assets>
+
+      <a-entity gltf-model="#model" position="0 0 -5" scale="1 1 1"></a-entity>
+      <a-camera position="0 1.6 0"></a-camera>
+    </a-scene>
+
+    <script>
+      let bosnianAudio = document.getElementById('audio-bosnian');
+      let englishAudio = document.getElementById('audio-english');
+      let germanAudio = document.getElementById('audio-german');
+      let italianAudio = document.getElementById('audio-italian');
+      let turkishAudio = document.getElementById('audio-turkish');
+
+      function stopAllAudio() {
+        [bosnianAudio, englishAudio, germanAudio, italianAudio, turkishAudio].forEach(audio => {
+          audio.pause();
+          audio.currentTime = 0;
+        });
+      }
+
+      function playAudio(audioElement) {
+        if (!audioElement || !audioElement.src) {
+          console.warn('Audio element nije definisan ili nema izvor.');
+          return;
+        }
+        stopAllAudio();
+        audioElement.play().then(() => {
+          console.log('Audio pokrenut:', audioElement.id);
+        }).catch(error => {
+          console.warn('Reprodukcija nije uspjela:', error);
+        });
+      }
+
+      window.addEventListener('load', () => {
+        const enableAudio = () => {
+          document.body.removeEventListener('click', enableAudio);
+
+          // Pusti bosanski prvi put nakon interakcije
+          playAudio(bosnianAudio);
+
+          // Poveži click evente
+          document.getElementById('eng-button').addEventListener('click', () => playAudio(englishAudio));
+          document.getElementById('deu-button').addEventListener('click', () => playAudio(germanAudio));
+          document.getElementById('ita-button').addEventListener('click', () => playAudio(italianAudio));
+          document.getElementById('tur-button').addEventListener('click', () => playAudio(turkishAudio));
+        };
+
+        document.body.addEventListener('click', enableAudio);
+      });
+
+      document.getElementById('location-link').addEventListener('click', () => {
+        window.location.href = 'https://www.google.com/maps/dir/?api=1&destination=44.28917242074484,18.659575885251613&travelmode=driving';
+      });
+
+      document.querySelectorAll('a-entity[gltf-model]').forEach(entity => {
+        entity.addEventListener('model-loaded', () => {
+          console.log('Model učitan:', entity.getAttribute('gltf-model'));
+        });
+        entity.addEventListener('model-error', (e) => {
+          console.error('Greška pri učitavanju modela:', e.detail, entity.getAttribute('gltf-model'));
+        });
+      });
+    </script>
+  </body>
+</html>
+
+
+
+ 
